@@ -3,6 +3,7 @@ import { BsCartPlusFill } from 'react-icons/bs';
 import { CiShoppingCart } from 'react-icons/ci';
 import { AiTwotoneDelete } from 'react-icons/ai';
 import axios from 'axios';
+import { router } from '@inertiajs/react'
 import { useEffect, useState } from "react";
 
 export default function Welcome({ auth, laravelVersion, phpVersion, product, goback, cart , displaycart, cartItems}) {
@@ -11,7 +12,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
     const handleCartIconClick = async (productId) => {
         try {
             await axios.post(route('product.add', [productId, count*1 + 1]));
-            setCount(count*1 + 1); // Increment the cart count
+            setCount(count*1 + 1);
         } catch (error) {
             console.log(error);
         }
@@ -21,28 +22,42 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
     const increment = async (productId, quantity) => {
         try {
             let count = quantity*1 + 1;
-              await axios.post(
-                route('setCartProductQuantity', {
-                    id: productId,
-                    quantity: count,
-                })
-            );
-            console.log('asd');
-            setCount(count*1 + 1);
+            router.post(route('setCartProductQuantity' , {
+                id: productId,
+                quantity: count,
+            }))
+
+            // setCount(count*1 + 1);
         } catch (error) {
             console.log(error);
         }
     };
 
-    const decrement = async (productId) => {
+    const decrement = async (productId, quantity) => {
         try {
-            await axios.post(route('setCartProductQuantity', productId));
-            setCount(count*1 - 1); // Increment the cart count
+            let count = quantity*1 - 1;
+            router.post(route('setCartProductQuantity' , {
+                id: productId,
+                quantity: count,
+            }))
+
+            // setCount(count*1 + 1);
         } catch (error) {
             console.log(error);
         }
     };
 
+
+    const del = async (id) => {
+        try {
+            router.post(route('delcart' , {
+                id: id,
+            }))
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
     }, [cart, count]);
@@ -107,8 +122,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
                                                 increment(e.product_id, e.total_quantity)
                                             }}
                                             >+</span>
-                                            <span className='cursor-pointer text-2xl mx-2'>-</span>
-                                            <span className='cursor-pointer text-red-500 text-xl mx-2'>Del</span>
+                                            <span  onClick={()=>{
+                                                decrement(e.product_id, e.total_quantity)
+                                            }} className='cursor-pointer text-2xl mx-2'>-</span>
+                                            <span onClick={()=>{
+                                                del(e.product_id)
+                                            }} className='cursor-pointer text-red-500 text-xl mx-2'>Del</span>
                                         </td>
                                     </tr>
                                             )

@@ -74,7 +74,10 @@ Route::middleware('auth')->group(function () {
     })->name('setCartProductQuantity');
 
     Route::post('del/{id}', function ($id){
-      return $id;
+
+        DB::table("carts")
+            ->where(['product_id' => $id])
+            ->delete();
     })->name('delcart');
 });
 
