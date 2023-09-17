@@ -48,13 +48,23 @@ Route::get('/cart', function (){
         'goback' => 1,
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'cartItems' => DB::select('SELECT c.product_id, p.name, SUM(c.quantity) as total_quantity, p.price
+        'cartItems' => DB::select('SELECT c.product_id, p.name, p.price, SUM(c.quantity) as total_quantity, p.price
 FROM products p
 JOIN carts c ON p.id = c.product_id
 where c.quantity > 0
 and c.user_id ='.Auth::id().'
 GROUP BY p.id, p.name'),
         'displaycart' => 1,
+        'countprice' => DB::select('SELECT SUM(c.quantity * c.price) AS total_money
+FROM (
+SELECT c.product_id, p.name, SUM(c.quantity) as quantity, p.price
+FROM products p
+JOIN carts c ON p.id = c.product_id
+where c.quantity > 0
+and c.user_id
+GROUP BY p.id, p.name
+
+) c '),
         'cart' => DB::table('carts')
             ->select(DB::raw('SUM(quantity) as total_quantity'))->where('user_id', Auth::id())
             ->value('total_quantity'),

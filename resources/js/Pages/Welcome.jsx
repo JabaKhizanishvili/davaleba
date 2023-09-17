@@ -6,7 +6,7 @@ import axios from 'axios';
 import { router } from '@inertiajs/react'
 import { useEffect, useState } from "react";
 
-export default function Welcome({ auth, laravelVersion, phpVersion, product, goback, cart , displaycart, cartItems}) {
+export default function Welcome({ auth, laravelVersion, phpVersion, product, goback, cart , displaycart, cartItems, countprice}) {
     const [count, setCount] = useState(cart);
 
     const handleCartIconClick = async (productId) => {
@@ -103,6 +103,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
                                     <tr>
                                         <th>name</th>
                                         <th>quantity</th>
+                                        <th>price</th>
                                         <th>action</th>
                                     </tr>
                                     </thead>
@@ -114,6 +115,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
                                         <td>{e.name}</td>
                                         <td className='flex justify-center'>
                                             {e.total_quantity}
+                                        </td>
+
+                                        <td>
+                                            {e.price}
                                         </td>
 
                                         <td className='border-2'>
@@ -138,6 +143,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
                                 </table>
                             </div>
                         </div>
+                        {cart.length > 0 ?
+                            <h2 className='text-white'>count sum : { countprice[0].total_money } gel</h2>
+                        : ''
+                        }
                             <Link className='text-red-300' href={'/'}>Go Back</Link>
                     </div>
                 </div>
