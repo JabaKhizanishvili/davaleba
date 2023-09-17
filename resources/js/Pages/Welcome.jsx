@@ -10,7 +10,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion, product, gob
     if (cart === null) {
         cart = [];
     }
-    console.log(cart);
 
     const [count, setCount] = useState(cart[0].total_quantity);
 

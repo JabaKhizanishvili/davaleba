@@ -61,7 +61,7 @@ SELECT c.product_id, p.name, SUM(c.quantity) as quantity, p.price
 FROM products p
 JOIN carts c ON p.id = c.product_id
 where c.quantity > 0
-and c.user_id
+and c.user_id = '.Auth::id().'
 GROUP BY p.id, p.name
 
 ) c '),
