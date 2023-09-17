@@ -7,7 +7,12 @@ import { router } from '@inertiajs/react'
 import { useEffect, useState } from "react";
 
 export default function Welcome({ auth, laravelVersion, phpVersion, product, goback, cart , displaycart, cartItems, countprice}) {
-    const [count, setCount] = useState(cart);
+    if (cart === null) {
+        cart = [];
+    }
+    console.log(cart);
+
+    const [count, setCount] = useState(cart[0].total_quantity);
 
     const handleCartIconClick = async (productId) => {
         try {

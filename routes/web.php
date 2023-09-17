@@ -17,9 +17,9 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
         'product' => Product::where('status' , '=' , 1)->get(),
-        'cart' => DB::table('carts')
-            ->select(DB::raw('SUM(quantity) as total_quantity'))
-            ->value('total_quantity'),
+        'cart' => DB::select('SELECT SUM(quantity) as total_quantity
+FROM carts
+WHERE user_id = '.Auth::id()),
     ]);
 })->middleware(['auth', 'verified']);
 
@@ -30,9 +30,9 @@ Route::get('/product/{id}', function ($id){
         'goback' => 1,
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'cart' => DB::table('carts')
-            ->select(DB::raw('SUM(quantity) as total_quantity'))
-            ->value('total_quantity'),
+        'cart' => DB::select('SELECT SUM(quantity) as total_quantity
+FROM carts
+WHERE user_id = '.Auth::id()),
         'product' => Product::where([
             ['status' , '=' , 1],
             ['id',$id],
@@ -48,7 +48,7 @@ Route::get('/cart', function (){
         'goback' => 1,
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'cartItems' => DB::select('SELECT c.product_id, p.name, p.price, SUM(c.quantity) as total_quantity, p.price
+        'cartItems' => DB::select('SELECT c.user_id, c.product_id, p.name, p.price, SUM(c.quantity) as total_quantity, p.price
 FROM products p
 JOIN carts c ON p.id = c.product_id
 where c.quantity > 0
@@ -65,9 +65,9 @@ and c.user_id
 GROUP BY p.id, p.name
 
 ) c '),
-        'cart' => DB::table('carts')
-            ->select(DB::raw('SUM(quantity) as total_quantity'))->where('user_id', Auth::id())
-            ->value('total_quantity'),
+        'cart' => DB::select('SELECT SUM(quantity) as total_quantity
+FROM carts
+WHERE user_id = '.Auth::id()),
         'product' => Product::all()
     ]);
 })->name('cart')->middleware(['auth', 'verified']);
@@ -78,15 +78,20 @@ Route::middleware('auth')->group(function () {
     Route::post('prodquantity/{id?}/{quantity?}', function ($id, $quantity) {
 //        $product = Product::findOrFail($id);
 
-        DB::table("carts")
-            ->where(['product_id' => $id])
+//        DB::table("carts")
+//            ->where(['product_id' => $id])
+//            ->update(['quantity' => $quantity]);
+
+
+        Cart::where('product_id', $id)
+            ->where('user_id', auth::id())
             ->update(['quantity' => $quantity]);
     })->name('setCartProductQuantity');
 
     Route::post('del/{id}', function ($id){
 
-        DB::table("carts")
-            ->where(['product_id' => $id])
+        Cart::where('product_id', $id)
+            ->where('user_id', auth()->id())
             ->delete();
     })->name('delcart');
 });
